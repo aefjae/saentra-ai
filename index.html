@@ -1,1414 +1,196 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Saentra — AI Personal Asisten yang Kenal Kamu</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --teal: #0ea5a0;
-      --teal-light: #2dd4d0;
-      --teal-dark: #0a7a76;
-      --teal-glow: rgba(14, 165, 160, 0.2);
-      --bg: #060d10;
-      --bg2: #0c1a1f;
-      --surface: #111e26;
-      --border: #1a3040;
-      --text: #e8f4f4;
-      --muted: #6a9aaa;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.5;
-    }
-
-    /* ── Nav ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 48px;
-      background: rgba(6, 13, 16, 0.85);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(14, 165, 160, 0.1);
-    }
-
-    .wordmark {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    .wordmark-text {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 22px;
-      letter-spacing: -1px;
-      display: flex;
-      align-items: baseline;
-      gap: 0;
-      position: relative;
-    }
-
-    .wordmark-text .w-s { color: var(--text); display: inline-block; transform: translateY(0px); }
-    .wordmark-text .w-ae { color: var(--teal); display: inline-block; transform: translateY(-1px); font-style: italic; text-shadow: 0 0 16px rgba(14,165,160,0.5); letter-spacing: -1px; }
-    .wordmark-text .w-n { color: var(--text); display: inline-block; transform: translateY(0px); }
-    .wordmark-text .w-t { color: var(--text); display: inline-block; transform: translateY(1px); }
-    .wordmark-text .w-r { color: var(--text); display: inline-block; transform: translateY(0px); }
-    .wordmark-text .w-a2 { color: var(--text); display: inline-block; transform: translateY(1px); }
-    .wordmark-text .w-dot { color: var(--muted); font-weight: 300; }
-    .wordmark-text .w-ai { color: var(--teal); font-weight: 400; font-size: 18px; }
-
-    .nav-badge {
-      font-size: 10px;
-      color: var(--teal);
-      border: 1px solid rgba(14,165,160,0.4);
-      padding: 2px 8px;
-      border-radius: 20px;
-      opacity: 0.8;
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 32px;
-      align-items: center;
-    }
-
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--text); }
-
-    .nav-cta {
-      background: var(--teal) !important;
-      color: var(--bg) !important;
-      padding: 8px 20px !important;
-      border-radius: 8px !important;
-      font-weight: 500 !important;
-      transition: all 0.2s !important;
-    }
-
-    .nav-cta:hover { background: var(--teal-light) !important; transform: translateY(-1px); }
-
-    /* ── Hero ── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 120px 48px 80px;
-      text-align: center;
-      position: relative;
-    }
-
-    .hero::after {
-      content: '';
-      position: absolute;
-      top: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(14,165,160,0.07) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--teal);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 28px;
-      padding: 6px 16px;
-      border: 1px solid rgba(14, 165, 160, 0.3);
-      border-radius: 20px;
-      background: rgba(14, 165, 160, 0.05);
-      animation: fadeUp 0.6s ease both;
-    }
-
-    .hero-eyebrow::before {
-      content: '';
-      width: 6px; height: 6px;
-      background: var(--teal);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.7); }
-    }
-
-    /* ── BIG HERO WORDMARK ── */
-    .hero-wordmark {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: clamp(70px, 14vw, 140px);
-      line-height: 0.9;
-      letter-spacing: -6px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 2px;
-      animation: fadeUp 0.6s 0.1s ease both;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-wordmark .hw-s { color: var(--text); display: inline-block; transform: translateY(4px); }
-    .hero-wordmark .hw-ae {
-      color: var(--teal);
-      display: inline-block;
-      transform: translateY(-6px);
-      font-style: italic;
-      text-shadow: 0 0 60px rgba(14,165,160,0.6);
-      letter-spacing: -2px;
-    }
-    .hero-wordmark .hw-n { color: var(--text); display: inline-block; transform: translateY(4px); }
-    .hero-wordmark .hw-t { color: var(--text); display: inline-block; transform: translateY(8px); }
-    .hero-wordmark .hw-r { color: var(--text); display: inline-block; transform: translateY(4px); }
-    .hero-wordmark .hw-a2 { color: var(--text); display: inline-block; transform: translateY(8px); }
-
-    .hero-wordmark-sub {
-      font-family: 'Syne', sans-serif;
-      font-weight: 400;
-      font-size: clamp(14px, 2.5vw, 22px);
-      color: var(--muted);
-      letter-spacing: 6px;
-      text-transform: uppercase;
-      margin-bottom: 32px;
-      animation: fadeUp 0.6s 0.15s ease both;
-    }
-
-    .hero-wordmark-sub span { color: var(--teal); }
-
-    .hero-desc {
-      font-size: 16px;
-      color: var(--muted);
-      max-width: 520px;
-      line-height: 1.7;
-      margin-bottom: 48px;
-      font-weight: 300;
-      animation: fadeUp 0.6s 0.2s ease both;
-    }
-
-    .download-group {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 20px;
-      animation: fadeUp 0.6s 0.25s ease both;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 28px;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all 0.2s;
-      cursor: pointer;
-      border: none;
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    .btn-primary {
-      background: var(--teal);
-      color: var(--bg);
-      box-shadow: 0 0 30px rgba(14, 165, 160, 0.3);
-    }
-
-    .btn-primary:hover {
-      background: var(--teal-light);
-      transform: translateY(-2px);
-      box-shadow: 0 0 40px rgba(14, 165, 160, 0.5);
-    }
-
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--teal);
-      color: var(--teal);
-      transform: translateY(-2px);
-    }
-
-    .hero-note {
-      font-size: 12px;
-      color: var(--muted);
-      animation: fadeUp 0.6s 0.3s ease both;
-    }
-
-    /* ── Powered by badge ── */
-    .powered-by {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 20px;
-      padding: 6px 14px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      animation: fadeUp 0.6s 0.35s ease both;
-    }
-
-    .powered-by span { color: var(--teal); font-weight: 500; }
-
-    /* ── Comparison Table ── */
-    .comparison {
-      padding: 100px 48px;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-    }
-
-    .comparison-table {
-      max-width: 900px;
-      margin: 0 auto;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-
-    .comparison-table table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .comparison-table th {
-      padding: 16px 20px;
-      font-family: 'Syne', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-
-    .comparison-table th:first-child { text-align: left; }
-
-    .comparison-table th.highlight {
-      background: rgba(14, 165, 160, 0.1);
-      color: var(--teal);
-      border-left: 1px solid rgba(14, 165, 160, 0.3);
-      border-right: 1px solid rgba(14, 165, 160, 0.3);
-    }
-
-    .comparison-table td {
-      padding: 14px 20px;
-      font-size: 14px;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-      color: var(--muted);
-    }
-
-    .comparison-table td:first-child { text-align: left; color: var(--text); font-weight: 500; }
-
-    .comparison-table td.highlight {
-      background: rgba(14, 165, 160, 0.05);
-      border-left: 1px solid rgba(14, 165, 160, 0.2);
-      border-right: 1px solid rgba(14, 165, 160, 0.2);
-      color: var(--text);
-    }
-
-    .comparison-table tr:last-child td { border-bottom: none; }
-
-    .check { color: var(--teal); font-size: 16px; }
-    .cross { color: #ef4444; font-size: 16px; }
-    .partial { color: #f59e0b; font-size: 13px; }
-
-    /* ── Features ── */
-    .features {
-      padding: 100px 48px;
-      background: var(--bg2);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--teal);
-      text-align: center;
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(32px, 5vw, 48px);
-      font-weight: 800;
-      text-align: center;
-      letter-spacing: -1px;
-      margin-bottom: 64px;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .feature-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px;
-      transition: all 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--teal), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .feature-card:hover { border-color: rgba(14, 165, 160, 0.3); transform: translateY(-4px); }
-    .feature-card:hover::before { opacity: 1; }
-
-    .feature-icon { font-size: 32px; margin-bottom: 16px; }
-
-    .feature-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .feature-desc {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.6;
-      font-weight: 300;
-    }
-
-    /* ── Use Cases ── */
-    .usecases {
-      padding: 100px 48px;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-    }
-
-    .usecases-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .usecase-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px;
-      transition: all 0.3s;
-    }
-
-    .usecase-card:hover { border-color: rgba(14, 165, 160, 0.3); transform: translateY(-3px); }
-
-    .usecase-tag {
-      font-size: 11px;
-      color: var(--teal);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      font-weight: 500;
-    }
-
-    .usecase-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .usecase-desc {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.6;
-      font-weight: 300;
-    }
-
-    /* ── How it works ── */
-    .how {
-      padding: 100px 48px;
-      background: var(--bg2);
-      border-top: 1px solid var(--border);
-    }
-
-    .steps {
-      max-width: 700px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .step {
-      display: flex;
-      gap: 24px;
-      align-items: flex-start;
-      padding-bottom: 48px;
-      position: relative;
-    }
-
-    .step:not(:last-child)::after {
-      content: '';
-      position: absolute;
-      left: 19px;
-      top: 44px;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--teal), transparent);
-    }
-
-    .step-num {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: var(--teal);
-      color: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 16px;
-      flex-shrink: 0;
-      z-index: 1;
-    }
-
-    .step-content { padding-top: 8px; }
-
-    .step-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 18px;
-      margin-bottom: 8px;
-    }
-
-    .step-desc {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.7;
-      font-weight: 300;
-    }
-
-    /* ── Pricing ── */
-    .pricing {
-      padding: 100px 48px;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-    }
-
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .pricing-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px;
-      transition: all 0.3s;
-      text-align: center;
-    }
-
-    .pricing-card.highlight {
-      border-color: rgba(14, 165, 160, 0.5);
-      background: rgba(14, 165, 160, 0.05);
-    }
-
-    .pricing-label {
-      font-size: 11px;
-      color: var(--teal);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-
-    .pricing-name {
-      font-family: 'Syne', sans-serif;
-      font-size: 22px;
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-
-    .pricing-price {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--teal);
-      margin: 16px 0 4px;
-    }
-
-    .pricing-price span {
-      font-size: 14px;
-      color: var(--muted);
-      font-weight: 300;
-    }
-
-    .pricing-desc {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 24px;
-      font-weight: 300;
-    }
-
-    .pricing-features {
-      list-style: none;
-      text-align: left;
-      margin-bottom: 28px;
-    }
-
-    .pricing-features li {
-      font-size: 13px;
-      color: var(--muted);
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .pricing-features li:last-child { border-bottom: none; }
-
-    .pricing-btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      text-align: center;
-      text-decoration: none;
-      transition: all 0.2s;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    .pricing-btn.primary {
-      background: var(--teal);
-      color: var(--bg);
-      border-color: var(--teal);
-    }
-
-    .pricing-btn:hover { transform: translateY(-1px); opacity: 0.9; }
-
-    /* ── CTA ── */
-    .cta {
-      padding: 120px 48px;
-      text-align: center;
-      border-top: 1px solid var(--border);
-    }
-
-    .cta h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(36px, 6vw, 60px);
-      font-weight: 800;
-      letter-spacing: -2px;
-      margin-bottom: 16px;
-    }
-
-    .cta p {
-      color: var(--muted);
-      margin-bottom: 40px;
-      font-size: 16px;
-      font-weight: 300;
-    }
-
-    /* ── Footer ── */
-    footer {
-      padding: 48px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      text-align: center;
-    }
-
-    footer p {
-      font-size: 14px;
-      color: var(--muted);
-      font-weight: 300;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 768px) {
-      nav { padding: 16px 24px; }
-      .nav-links { gap: 16px; }
-      .hero { padding: 100px 24px 60px; }
-      .features, .how, .pricing, .usecases, .comparison { padding: 80px 24px; }
-      .cta { padding: 80px 24px; }
-      footer { padding: 40px 24px; }
-      .hero-wordmark { letter-spacing: -3px; }
-    }
-  </style>
-</head>
-<body>
-
-  <nav>
-    <a class="wordmark" href="#">
-      <div class="wordmark-text">
-        <span class="w-s">S</span><span class="w-ae">ae</span><span class="w-n">n</span><span class="w-t">t</span><span class="w-r">r</span><span class="w-a2">a</span>
-      </div>
-      <span class="nav-badge">Beta</span>
-    </a>
-    <div class="nav-links">
-      <a href="#fitur">Fitur</a>
-      <a href="#harga">Harga</a>
-      <a href="#lihat">Lihat App</a>
-      <a href="#faq">FAQ</a>
-      <a href="kenapa.html" style="color:var(--teal)">Kenapa</a>
-      <a href="#mulai" class="nav-cta">Coba Gratis</a>
-    </div>
-  </nav>
-
-  <section class="hero">
-    <div class="hero-eyebrow">🔥 Beta — Ai Personal Asisten Untuk Indonesia</div>
-    <div class="hero-wordmark">
-      <span class="hw-s">S</span><span class="hw-ae">ae</span><span class="hw-n">n</span><span class="hw-t">t</span><span class="hw-r">r</span><span class="hw-a2">a</span>
-    </div>
-    <div class="hero-wordmark-sub">AI yang <span>kenal</span> kamu,<br/>dengan <span>seizin</span> kamu</div>
-    <p class="hero-desc">
-      AI personal asisten gratis dengan memory — yang AI gratis lain belum kasih. Saentra bisa inget siapa kamu, bukan cuma apa yang kamu tanya. Tapi kalau kamu tidak mau, tinggal matiin — dan Saentra tidak akan menyimpan apapun tentang kamu.
-    </p>
-    <div class="download-group">
-      <a href="#mulai" class="btn btn-primary">✨ Mulai Gratis</a>
-      <a href="#fitur" class="btn btn-secondary">Pelajari lebih lanjut</a>
-    </div>
-    <p class="hero-note">Gratis · 20 prompt/hari · Memory 30 hari · Tanpa kartu kredit · Hapus data kapanpun</p>
-    <div class="powered-by">Powered by <span>Claude · Anthropic</span> — AI terpercaya</div>
-  </section>
-
-  <!-- Comparison Section -->
-  <section class="comparison" id="perbandingan">
-    <p class="section-label">Kenapa Saentra</p>
-    <h2 class="section-title">Yang AI gratis lain ga kasih</h2>
-    <div class="comparison-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Fitur</th>
-            <th class="highlight">Saentra</th>
-            <th>ChatGPT Free</th>
-            <th>Gemini Free</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Memory jangka panjang</td>
-            <td class="highlight"><span class="check">✅ 30 hari</span></td>
-            <td><span class="cross">❌</span></td>
-            <td><span class="cross">❌</span></td>
-          </tr>
-          <tr>
-            <td>Kenal konteks hidupmu</td>
-            <td class="highlight"><span class="check">✅</span></td>
-            <td><span class="cross">❌</span></td>
-            <td><span class="cross">❌</span></td>
-          </tr>
-          <tr>
-            <td>Bahasa Indonesia natural</td>
-            <td class="highlight"><span class="check">✅</span></td>
-            <td><span class="partial">⚡ Lumayan</span></td>
-            <td><span class="partial">⚡ Lumayan</span></td>
-          </tr>
-          <tr>
-            <td>Personal asisten (bukan chatbot)</td>
-            <td class="highlight"><span class="check">✅</span></td>
-            <td><span class="cross">❌</span></td>
-            <td><span class="cross">❌</span></td>
-          </tr>
-          <tr>
-            <td>Bantu upgrade pola pikir</td>
-            <td class="highlight"><span class="check">✅</span></td>
-            <td><span class="cross">❌</span></td>
-            <td><span class="cross">❌</span></td>
-          </tr>
-          <tr>
-            <td>Gratis</td>
-            <td class="highlight"><span class="check">✅</span></td>
-            <td><span class="check">✅</span></td>
-            <td><span class="check">✅</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- Features -->
-  <section class="features" id="fitur">
-    <p class="section-label">Kenapa Saentra</p>
-    <h2 class="section-title">AI yang beneran ngerti kamu</h2>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🧠</div>
-        <h3 class="feature-title">Memory 30 hari</h3>
-        <p class="feature-desc">Saentra inget goals kamu, cerita kamu, bahkan pola pikir kamu — selama 30 hari. Makin lama kamu pakai, makin dia kenal kamu. Tidak nyaman? Hapus kapanpun — Saentra tidak akan mengingat apapun yang kamu hapus.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">💬</div>
-        <h3 class="feature-title">Personal, bukan generik</h3>
-        <p class="feature-desc">Kamu curhat soal interview minggu lalu, minggu ini Saentra nanya duluan "gimana hasilnya?" — bukan AI yang lupa setiap sesi.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🇮🇩</div>
-        <h3 class="feature-title">Bahasa Indonesia natural</h3>
-        <p class="feature-desc">Ngobrol santai pakai Bahasa Indonesia. Ga perlu gaya-gayaan pake English buat dapet jawaban yang akurat dan relevan.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔑</div>
-        <h3 class="feature-title">Kamu yang pegang kendali</h3>
-        <p class="feature-desc">Memory tersimpan di komputermu sendiri, bukan di server kami. Kamu bisa lihat, edit, atau hapus ingatan Saentra kapanpun. Mau mulai fresh? Satu klik, semua terhapus.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🚀</div>
-        <h3 class="feature-title">Bantu kamu upgrade</h3>
-        <p class="feature-desc">Saentra bukan cuma jawab pertanyaan — dia bantu pola pikirmu berkembang, dan rekomendasiin AI lain kalau kamu udah siap explore lebih jauh.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Founder Teaser -->
-  <section style="padding:80px 48px;background:var(--bg);border-top:1px solid var(--border)">
-    <div style="max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:0">
-      <p style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:20px">Dari Pembangunnya</p>
-      <blockquote style="font-family:'Syne',sans-serif;font-size:clamp(20px,3vw,28px);font-weight:700;line-height:1.45;letter-spacing:-0.5px;margin-bottom:24px;border:none;padding:0">
-        "Aku mulai dari <span style="color:var(--teal)">Gemini gratis</span>. Tidak kuliah. Dari Manado. Saentra lahir dari satu pertanyaan: kenapa orang Indonesia masih jadi <span style="color:var(--teal)">penonton</span> revolusi AI ini?"
-      </blockquote>
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
-        <div style="display:flex;align-items:center;gap:14px">
-          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--teal-light),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;font-style:italic;color:var(--bg);flex-shrink:0">ae</div>
-          <div>
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">Jeremia Frederik</div>
-            <div style="font-size:12px;color:var(--muted);font-weight:300">Founder Saentra · Manado · Lulusan SMA</div>
-          </div>
-        </div>
-        <a href="kenapa.html" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--teal);text-decoration:none;font-weight:500;border:1px solid rgba(14,165,160,0.3);padding:8px 18px;border-radius:8px;transition:all 0.2s" onmouseover="this.style.background='rgba(14,165,160,0.08)'" onmouseout="this.style.background='transparent'">Baca cerita lengkap →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Use Cases -->
-  <section class="usecases" id="usecase">
-    <p class="section-label">Use Cases</p>
-    <h2 class="section-title">Cocok buat kamu yang...</h2>
-    <div class="usecases-grid">
-      <div class="usecase-card">
-        <div class="usecase-tag">Karir</div>
-        <h3 class="usecase-title">Lagi cari kerja atau naik jabatan</h3>
-        <p class="usecase-desc">Saentra inget posisi yang kamu apply, bantu prep interview, dan followup perkembanganmu tanpa kamu harus ngulang cerita dari awal.</p>
-      </div>
-      <div class="usecase-card">
-        <div class="usecase-tag">Belajar</div>
-        <h3 class="usecase-title">Mau belajar skill baru</h3>
-        <p class="usecase-desc">Dari coding sampai bisnis — Saentra tahu persis skill level kamu dan sesuaikan penjelasannya. Ga perlu bilang "jelasin dari awal" setiap hari.</p>
-      </div>
-      <div class="usecase-card">
-        <div class="usecase-tag">Produktivitas</div>
-        <h3 class="usecase-title">Sering stuck dan overthinking</h3>
-        <p class="usecase-desc">Saentra bisa notice pattern — "kamu sering overthinking malem-malem, biasanya soal apa?" — dan bantu kamu keluar dari loop itu.</p>
-      </div>
-      <div class="usecase-card">
-        <div class="usecase-tag">Bisnis</div>
-        <h3 class="usecase-title">Bangun bisnis atau side project</h3>
-        <p class="usecase-desc">Saentra tau context bisnis kamu, ingat keputusan yang udah dibuat, dan bantu kamu berpikir lebih strategis — kayak punya business partner gratis.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- How it works -->
-  <section class="how" id="cara">
-    <p class="section-label">Cara Pakai</p>
-    <h2 class="section-title" style="text-align:center">Simpel banget</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h3 class="step-title">Download & langsung pakai</h3>
-          <p class="step-desc">Download Saentra, install seperti biasa, langsung jalan. Ga perlu daftar, ga perlu isi form — tinggal buka dan mulai ngobrol.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h3 class="step-title">Ceritain konteks kamu</h3>
-          <p class="step-desc">Kasih tau Saentra siapa kamu, goals kamu, apa yang lagi kamu hadapin. Dia akan ingat semuanya.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h3 class="step-title">Rasain bedanya</h3>
-          <p class="step-desc">Balik lagi besok, minggu depan, bulan depan — Saentra masih ingat kamu. Bukan AI yang lupa setiap sesi.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Pricing -->
-  <section class="pricing" id="harga">
-    <p class="section-label">Harga</p>
-    <h2 class="section-title">Mulai gratis, bayar kalau butuh lebih</h2>
-    <div class="pricing-grid">
-      <div class="pricing-card">
-        <div class="pricing-label">Gratis</div>
-        <div class="pricing-name">Free</div>
-        <div class="pricing-price">Rp 0 <span>/ bulan</span></div>
-        <div class="pricing-desc">Cukup untuk mulai dan merasakan bedanya</div>
-        <ul class="pricing-features">
-          <li><span class="check">✅</span> Memory 30 hari</li>
-          <li><span class="check">✅</span> Personal asisten</li>
-          <li><span class="check">✅</span> Bahasa Indonesia</li>
-          <li><span class="partial">⚡</span> 20 prompt/hari (gratis)</li>
-        </ul>
-        <a href="#mulai" class="pricing-btn">Mulai Gratis</a>
-      </div>
-      <div class="pricing-card highlight">
-        <div class="pricing-label">Top Up</div>
-        <div class="pricing-name">Prompt Pack</div>
-        <div class="pricing-price">Segera <span>hadir</span></div>
-        <div class="pricing-desc">Bayar sesuai kebutuhan, tanpa langganan</div>
-        <ul class="pricing-features">
-          <li><span class="check">✅</span> Starter — Rp 5.000 · 20 prompt</li>
-          <li><span class="check">✅</span> Regular — Rp 12.000 · 60 prompt</li>
-          <li><span class="check">✅</span> Hemat — Rp 20.000 · 120 prompt</li>
-          <li><span class="check">✅</span> Memory tetap aktif</li>
-        </ul>
-        <a href="#" class="pricing-btn" style="opacity:0.6;cursor:not-allowed">🔔 Notifikasi Saya</a>
-      </div>
-      <div class="pricing-card">
-        <div class="pricing-label">Pro</div>
-        <div class="pricing-name">Unlimited</div>
-        <div class="pricing-price">Segera <span>hadir</span></div>
-        <div class="pricing-desc">Memory unlimited + fitur eksklusif</div>
-        <ul class="pricing-features">
-          <li><span class="check">✅</span> Memory unlimited</li>
-          <li><span class="check">✅</span> Prompt unlimited</li>
-          <li><span class="check">✅</span> Prioritas response</li>
-          <li><span class="check">✅</span> Fitur eksklusif pro</li>
-        </ul>
-        <a href="#" class="pricing-btn">Notifikasi Saya</a>
-      </div>
-    </div>
-
-    <!-- Transparansi biaya -->
-    <div style="max-width:720px;margin:56px auto 0;padding:32px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;">
-      <p style="font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px">Jujur soal biaya</p>
-      <p style="font-size:15px;color:var(--muted);font-weight:300;line-height:1.8;margin-bottom:20px">
-        Aku ingin Saentra bisa dinikmati sepenuhnya gratis — itu niat awalku. Tapi ada kenyataan yang perlu aku sampaikan: <strong style="color:var(--text)">untuk mengakses AI sepandai ini, ada biaya nyata ke penyedianya.</strong> Saentra dibangun di atas Claude dari Anthropic, dan ini bukan kebetulan.
-      </p>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px" id="price-compare">
-        <div style="display:flex;align-items:center;gap:12px">
-          <span style="font-size:13px;color:var(--muted);min-width:110px;font-weight:300">ChatGPT Free</span>
-          <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden">
-            <div class="pbar" style="height:100%;width:0;background:linear-gradient(90deg,var(--teal-light),var(--teal-dark));border-radius:3px;transition:width 1.2s ease" data-w="62%"></div>
-          </div>
-          <span style="font-size:12px;color:var(--muted);min-width:60px;text-align:right">Cukup</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <span style="font-size:13px;color:var(--muted);min-width:110px;font-weight:300">Gemini Free</span>
-          <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden">
-            <div class="pbar" style="height:100%;width:0;background:linear-gradient(90deg,var(--teal-light),var(--teal-dark));border-radius:3px;transition:width 1.2s ease" data-w="68%"></div>
-          </div>
-          <span style="font-size:12px;color:var(--muted);min-width:60px;text-align:right">Bagus</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <span style="font-size:13px;color:var(--text);font-weight:500;min-width:110px">Claude ✦</span>
-          <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden">
-            <div class="pbar" style="height:100%;width:0;background:linear-gradient(90deg,var(--teal-light),var(--teal-dark));border-radius:3px;transition:width 1.2s ease" data-w="93%"></div>
-          </div>
-          <span style="font-size:12px;color:var(--teal);font-weight:500;min-width:60px;text-align:right">Terbaik</span>
-        </div>
-      </div>
-      <p style="font-size:14px;color:var(--muted);font-weight:300;line-height:1.75;margin-bottom:16px">
-        Prompt Pack bukan tentang untung-rugi — itu cara aku menjaga Saentra tetap berjalan tanpa mengorbankan kualitas AI-nya. <strong style="color:var(--text)">Free tier tetap ada</strong>, dan aku pastikan cukup untuk kamu rasakan betapa berbedanya sebelum memutuskan apapun.
-      </p>
-      <a href="kenapa.html#transparansi" style="font-size:13px;color:var(--teal);text-decoration:none;font-weight:500;">Baca lebih lengkap →</a>
-      <p style="font-size:12px;color:var(--muted);margin-top:12px;font-weight:300">⏳ Top Up & Pro plan segera hadir — stay tuned di <strong style="color:var(--teal)">@saentra.ai</strong></p>
-    </div>
-  </section>
-
-  <!-- Screenshot Section -->
-  <section style="padding:100px 48px;background:var(--bg2);border-top:1px solid var(--border)" id="lihat">
-    <p class="section-label">Lihat Saentra Beraksi</p>
-    <h2 class="section-title">Bukan janji — ini <span style="color:var(--teal)">buktinya</span></h2>
-    <p style="text-align:center;color:var(--muted);font-size:15px;margin-bottom:64px;font-weight:300;max-width:560px;margin-left:auto;margin-right:auto">Saentra nempel di pojok layarmu — always on top, siap dipanggil kapanpun kamu butuh</p>
-
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(480px,1fr));gap:32px;max-width:1100px;margin:0 auto">
-      <!-- Real screenshot -->
-      <div style="position:relative">
-        <div style="position:absolute;top:-12px;left:20px;z-index:2;background:var(--teal);color:var(--bg);font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px">SCREENSHOT NYATA</div>
-        <div style="border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,0.5)">
-          <img src="9.jpg" alt="Saentra membantu cek fakta konten viral di Instagram" style="width:100%;display:block"/>
-        </div>
-        <p style="font-size:13px;color:var(--muted);margin-top:16px;text-align:center;font-weight:300">Lagi scroll Instagram, nemu klaim viral — Saentra langsung bantu cek faktanya 🔍</p>
-      </div>
-
-      <!-- Canvas-generated placeholder: berbeda topik -->
-      <div style="position:relative">
-        <div style="position:absolute;top:-12px;left:20px;z-index:2;background:var(--surface);color:var(--teal);font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px;border:1px solid rgba(14,165,160,0.4)">CONTOH KASUS</div>
-        <div style="border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,0.5)">
-          <canvas id="mockCanvas" width="780" height="520" style="width:100%;display:block"></canvas>
-        </div>
-        <p style="font-size:13px;color:var(--muted);margin-top:16px;text-align:center;font-weight:300">Lagi coding, ketemu error — Saentra baca layarmu dan langsung kasih solusi 💻</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ Section -->
-  <section style="padding:100px 48px;background:var(--bg);border-top:1px solid var(--border)" id="faq">
-    <p class="section-label">Pertanyaan Umum</p>
-    <h2 class="section-title">Hal yang sering<br/>ditanyain</h2>
-    <div style="max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:2px" id="faq-list">
-
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          <span>Apakah data aku aman?</span>
-          <span class="faq-arrow">↓</span>
-        </button>
-        <div class="faq-a">
-          <p>Ya. Saentra tidak punya server — data kamu tidak pernah lewat kami. Pertanyaan dan screenshot (kalau diaktifkan) dikirim langsung dari komputermu ke Claude API milik Anthropic via HTTPS terenkripsi. Riwayat chat tersimpan lokal di komputermu, bukan di cloud. Kamu bisa hapus kapanpun.</p>
-          <a href="privacy.html" style="color:var(--teal);font-size:13px;text-decoration:none;font-weight:500">Baca kebijakan privasi lengkap →</a>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          <span>Bedanya sama ChatGPT apa?</span>
-          <span class="faq-arrow">↓</span>
-        </button>
-        <div class="faq-a">
-          <p>ChatGPT (free) lupa kamu setiap sesi baru — kamu harus jelasin konteks dari awal terus. Saentra punya memory lintas sesi: dia ingat goals, cerita, dan pola pikirmu selama 30 hari. Selain itu, Saentra jalan sebagai overlay di desktop — bisa dibuka dengan cepat sambil tetap pakai app lain. Dan Saentra pakai Claude dari Anthropic, yang dikenal lebih akurat dan lebih jujur bilang "aku tidak tahu".</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          <span>Berapa batas prompt gratis per hari?</span>
-          <span class="faq-arrow">↓</span>
-        </button>
-        <div class="faq-a">
-          <p>Free tier Saentra kasih <strong>20 prompt per hari</strong> — cukup untuk pemakaian harian yang normal. Ini setara dengan separuh batas Claude web gratis, karena ada biaya API yang kami tanggung. Limit reset setiap tengah malam. Top Up akan tersedia segera untuk yang butuh lebih.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          <span>OS apa yang didukung?</span>
-          <span class="faq-arrow">↓</span>
-        </button>
-        <div class="faq-a">
-          <p>Saentra tersedia untuk <strong>Windows, macOS, dan Linux</strong>. Dibuat pakai Electron jadi bisa jalan di ketiga platform. Download akan tersedia segera — daftarkan dirimu di 100 beta pertama biar dapat notifikasi duluan.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          <span>Apa itu fitur screenshot layar?</span>
-          <span class="faq-arrow">↓</span>
-        </button>
-        <div class="faq-a">
-          <p>Saentra punya toggle "Kirim screenshot layar" — kalau diaktifkan, setiap kamu kirim pesan, Saentra juga kirim gambar layarmu ke Claude supaya bisa bantu lebih kontekstual (misalnya: "itu di layar emang bener?"). Screenshot diambil <strong>hanya saat kamu tekan kirim</strong>, bukan otomatis. Kamu bisa matiin toggle ini kapanpun — dan tidak ada screenshot yang akan diambil sama sekali.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          <span>Siapa yang bikin Saentra?</span>
-          <span class="faq-arrow">↓</span>
-        </button>
-        <div class="faq-a">
-          <p>Saentra dibangun oleh Jeremia Frederik — developer independen dari Manado, lulusan SMA, belajar otodidak pakai AI. Saentra lahir dari frustrasi: kenapa orang Indonesia harus bayar mahal untuk AI yang beneran personal? <a href="kenapa.html" style="color:var(--teal);text-decoration:none;font-weight:500">Baca cerita lengkapnya →</a></p>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <style>
-    .faq-item { border-bottom: 1px solid var(--border); }
-    .faq-q {
-      width: 100%; display: flex; justify-content: space-between; align-items: center;
-      padding: 24px 0; background: none; border: none; color: var(--text);
-      font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700;
-      cursor: pointer; text-align: left; gap: 16px; transition: color 0.2s;
-    }
-    .faq-q:hover { color: var(--teal); }
-    .faq-arrow { font-size: 18px; transition: transform 0.3s; flex-shrink: 0; color: var(--teal); }
-    .faq-q.open .faq-arrow { transform: rotate(180deg); }
-    .faq-a {
-      max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s;
-      padding-bottom: 0;
-    }
-    .faq-a.open { max-height: 300px; padding-bottom: 24px; }
-    .faq-a p { color: var(--muted); font-size: 15px; font-weight: 300; line-height: 1.8; margin-bottom: 10px; }
-    .faq-a p strong { color: var(--text); font-weight: 500; }
-  </style>
-
-  <!-- CTA -->
-  <section class="cta" id="mulai">
-    <h2>Mulai sekarang,<br/><span style="color:var(--teal)">gratis</span></h2>
-    <p>Rasain AI yang beneran kenal kamu — bukan yang lupa setiap sesi</p>
-    <div class="download-group">
-      <a href="#" class="btn btn-primary">✨ Coba Saentra Gratis</a>
-    </div>
-    <p style="font-size:12px;color:var(--muted);margin-top:16px">Gratis · 20 prompt/hari · Memory 30 hari · Tanpa kartu kredit · Powered by Claude</p>
-    <p style="font-size:12px;color:var(--teal);margin-top:8px;font-weight:500">🔥 Hanya 100 slot beta pertama — gratis selamanya untuk early adopter</p>
-  </section>
-
-  <!-- Privacy -->
-  <section style="padding:100px 48px;background:var(--bg2);border-top:1px solid var(--border)">
-    <div style="max-width:900px;margin:0 auto">
-      <p style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--teal);text-align:center;margin-bottom:16px">Privasi & Keamanan</p>
-      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;text-align:center;letter-spacing:-1px;margin-bottom:16px">Gimana data kamu<br/>mengalir?</h2>
-      <p style="text-align:center;color:var(--muted);font-size:15px;margin-bottom:64px;font-weight:300">Transparan 100% — ini yang terjadi saat kamu kirim pesan ke Saentra</p>
-
-      <div style="display:flex;flex-direction:column;gap:0;position:relative;max-width:600px;margin:0 auto 64px">
-        <div style="display:flex;gap:24px;align-items:flex-start;padding-bottom:40px;position:relative">
-          <div style="width:44px;height:44px;border-radius:50%;background:var(--teal);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;z-index:1">💬</div>
-          <div style="position:absolute;left:21px;top:44px;bottom:0;width:2px;background:linear-gradient(to bottom,var(--teal),transparent)"></div>
-          <div>
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px">Kamu kirim pesan</div>
-            <div style="color:var(--muted);font-size:14px;line-height:1.6;font-weight:300">Pertanyaan atau ceritamu dikirim ke Saentra. Memory-mu yang relevan otomatis disertakan sebagai konteks.</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:24px;align-items:flex-start;padding-bottom:40px;position:relative">
-          <div style="width:44px;height:44px;border-radius:50%;background:var(--teal);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;z-index:1">🔐</div>
-          <div style="position:absolute;left:21px;top:44px;bottom:0;width:2px;background:linear-gradient(to bottom,var(--teal),transparent)"></div>
-          <div>
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px">Diproses oleh Claude (Anthropic)</div>
-            <div style="color:var(--muted);font-size:14px;line-height:1.6;font-weight:300">Pesan dikirim ke <strong style="color:var(--text)">Claude API milik Anthropic</strong> — AI terpercaya yang jadi fondasi Saentra. Koneksi terenkripsi HTTPS.</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:24px;align-items:flex-start;padding-bottom:40px;position:relative">
-          <div style="width:44px;height:44px;border-radius:50%;background:var(--teal);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;z-index:1">🧠</div>
-          <div style="position:absolute;left:21px;top:44px;bottom:0;width:2px;background:linear-gradient(to bottom,var(--teal),transparent)"></div>
-          <div>
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px">Memory diperbarui</div>
-            <div style="color:var(--muted);font-size:14px;line-height:1.6;font-weight:300">Saentra simpan <strong style="color:var(--text)">summary + key moments</strong> dari percakapan — bukan raw conversation. Hemat, efisien, dan lebih "manusiawi".</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:24px;align-items:flex-start">
-          <div style="width:44px;height:44px;border-radius:50%;background:var(--teal);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✅</div>
-          <div>
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px">Kamu yang kontrol</div>
-            <div style="color:var(--muted);font-size:14px;line-height:1.6;font-weight:300">Kamu bisa lihat, edit, atau hapus memory kamu kapanpun. Data kamu, kendali kamu.</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;gap:16px;align-items:center">
-          <span style="font-size:28px">🔒</span>
-          <div>
-            <div style="font-weight:600;font-size:14px;margin-bottom:2px">Enkripsi HTTPS</div>
-            <div style="color:var(--muted);font-size:13px;font-weight:300">Semua koneksi ke Anthropic terenkripsi</div>
-          </div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;gap:16px;align-items:center">
-          <span style="font-size:28px">✏️</span>
-          <div>
-            <div style="font-weight:600;font-size:14px;margin-bottom:2px">Memory bisa diedit</div>
-            <div style="color:var(--muted);font-size:13px;font-weight:300">Kamu bisa hapus atau edit memory kapanpun</div>
-          </div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;gap:16px;align-items:center">
-          <span style="font-size:28px">🤝</span>
-          <div>
-            <div style="font-weight:600;font-size:14px;margin-bottom:2px">Powered by Anthropic</div>
-            <div style="color:var(--muted);font-size:13px;font-weight:300">Fondasi AI yang aman dan terpercaya</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="wordmark-text" style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;letter-spacing:-1px">
-      <span class="w-s">S</span><span class="w-ae">ae</span><span class="w-n">n</span><span class="w-t">t</span><span class="w-r">r</span><span class="w-a2">a</span>
-    </div>
-    <p>Dibuat dengan ❤️ untuk Indonesia · @saentra.ai</p>
-    <p style="font-size:13px;color:var(--muted)">
-      <a href="privacy.html" style="color:var(--muted);text-decoration:none">Kebijakan Privasi</a> · Beta v0.1.0 · Powered by Claude
-    </p>
-  </footer>
-
-  <script>
-    // FAQ toggle
-    function toggleFaq(btn) {
-      const answer = btn.nextElementSibling;
-      const isOpen = btn.classList.contains('open');
-      // close all
-      document.querySelectorAll('.faq-q.open').forEach(b => {
-        b.classList.remove('open');
-        b.nextElementSibling.classList.remove('open');
-      });
-      if (!isOpen) {
-        btn.classList.add('open');
-        answer.classList.add('open');
+const { setMemory, getMemory, getAllMemory, saveChatMessage, getRecentHistory } = require('./database')
+const { app, BrowserWindow, globalShortcut, ipcMain, screen, desktopCapturer } = require('electron')
+const path = require('path')
+const https = require('https')
+const dns = require('dns')
+
+dns.setDefaultResultOrder('ipv4first')
+
+let overlayWindow = null
+
+const BACKEND_URL = 'https://nalar-backend-production.up.railway.app'
+
+function createOverlay() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
+
+  overlayWindow = new BrowserWindow({
+    width: 420,
+    height: 600,
+    x: width - 440,
+    y: height - 630,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    resizable: true,
+    hasShadow: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
+    }
+  })
+
+  overlayWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
+  overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: false })
+  overlayWindow.show()
+}
+
+async function takeScreenshot() {
+  const sources = await desktopCapturer.getSources({
+    types: ['screen'],
+    thumbnailSize: { width: 1920, height: 1080 }
+  })
+  if (sources.length === 0) return null
+  return sources[0].thumbnail.toJPEG(85).toString('base64')
+}
+
+function httpPost(url, data) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify(data)
+    const urlObj = new URL(url)
+    const options = {
+      hostname: urlObj.hostname,
+      path: urlObj.pathname,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body)
+      },
+      timeout: 30000
+    }
+
+    const req = https.request(options, (res) => {
+      let responseData = ''
+      res.on('data', chunk => responseData += chunk)
+      res.on('end', () => {
+        try { resolve(JSON.parse(responseData)) }
+        catch (e) { reject(new Error('Invalid JSON response')) }
+      })
+    })
+
+    req.on('error', reject)
+    req.on('timeout', () => {
+      req.destroy()
+      reject(new Error('Request timeout'))
+    })
+    req.write(body)
+    req.end()
+  })
+}
+
+async function askNalar(question, screenshotBase64, chatHistory) {
+  // Ambil semua memory user
+  const memories = getAllMemory()
+  const memoryContext = memories.length > 0
+    ? '\n\nAPA YANG KAMU TAU TENTANG USER INI:\n' +
+      memories.map(m => `- ${m.key}: ${m.value}`).join('\n')
+    : ''
+
+  // Retry logic untuk handle Overloaded / 529 dari Anthropic
+  const maxRetries = 3
+  let lastError
+  let data
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      data = await httpPost(`${BACKEND_URL}/ask`, {
+        question,
+        screenshot: screenshotBase64,
+        chatHistory: chatHistory.slice(-6),
+        memoryContext
+      })
+      break // sukses, keluar dari loop
+    } catch (err) {
+      lastError = err
+      const isOverloaded = err.message?.includes('Overloaded') || err.message?.includes('529') || err.message?.includes('503')
+      if (isOverloaded && attempt < maxRetries - 1) {
+        const waitMs = (attempt + 1) * 2000 // 2s, 4s
+        console.log(`⏳ API overloaded, retry ${attempt + 1}/${maxRetries - 1} dalam ${waitMs / 1000}s...`)
+        await new Promise(r => setTimeout(r, waitMs))
+        continue
       }
+      throw err
     }
+  }
 
-    // Canvas mock: coding scenario
-    const canvas = document.getElementById('mockCanvas');
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      const W = 780, H = 520;
+  if (!data) throw lastError
+  if (!data.success) {
+    const isOverloaded = data.answer?.includes('Overloaded') || data.answer?.includes('overloaded')
+    if (isOverloaded) throw new Error('Overloaded')
+    throw new Error(data.answer)
+  }
 
-      // Background: browser + VSCode feel
-      ctx.fillStyle = '#1e1e1e';
-      ctx.fillRect(0, 0, W, H);
+  // Simpan percakapan ke history
+  saveChatMessage('user', question)
+  saveChatMessage('assistant', data.answer)
 
-      // Top bar (browser chrome)
-      ctx.fillStyle = '#2d2d2d';
-      ctx.fillRect(0, 0, W, 38);
-      ctx.fillStyle = '#3c3c3c';
-      ctx.beginPath(); ctx.arc(14, 19, 6, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#3c3c3c';
-      ctx.beginPath(); ctx.arc(32, 19, 6, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#3c3c3c';
-      ctx.beginPath(); ctx.arc(50, 19, 6, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#555';
-      ctx.fillRect(72, 10, 380, 18);
-      ctx.fillStyle = '#888';
-      ctx.font = '11px monospace';
-      ctx.fillText('localhost:3000/dashboard.js', 82, 23);
-
-      // Code editor area
-      // Line numbers
-      ctx.fillStyle = '#252526';
-      ctx.fillRect(0, 38, 40, H-38);
-      ctx.fillStyle = '#555';
-      ctx.font = '12px monospace';
-      for (let i = 0; i < 18; i++) {
-        ctx.fillText(String(i+1).padStart(2,' '), 8, 60 + i*24);
-      }
-
-      // Code lines
-      const lines = [
-        { color: '#569cd6', text: 'async function' },
-        { color: '#dcdcaa', text: ' fetchUserData' },
-        { color: '#d4d4d4', text: '(userId) {' },
-      ];
-
-      const codeLine = [
-        ['#569cd6','async ','#dcdcaa','function ','#d4d4d4','fetchUserData','#d4d4d4','(userId) {'],
-        ['#569cd6','  const ','#9cdcfe','response ','#d4d4d4','= ','#569cd6','await ','#dcdcaa','fetch','#d4d4d4','(`/api/users/${userId}`);'],
-        ['#569cd6','  const ','#9cdcfe','data ','#d4d4d4','= ','#569cd6','await ','#9cdcfe','response','#d4d4d4','.','#dcdcaa','json','#d4d4d4','();'],
-        ['#d4d4d4','  '],
-        ['#c586c0','  if ','#d4d4d4','(!','#9cdcfe','data','#d4d4d4',') {'],
-        ['#ce9178','    // TypeError: Cannot read properties of undefined'],
-        ['#d4d4d4','    console.','#dcdcaa','log','#d4d4d4','(','#ce9178','"Error fetching data"','#d4d4d4',');'],
-        ['#d4d4d4','  }'],
-        ['#d4d4d4','  '],
-        ['#c586c0','  return ','#9cdcfe','data','#d4d4d4',';'],
-        ['#d4d4d4','}'],
-        ['#d4d4d4',''],
-        ['#6a9955','// ❌ Error di bawah ini tiap kali user baru login'],
-        ['#569cd6','const ','#9cdcfe','result ','#d4d4d4','= fetchUserData(','#ce9178','undefined','#d4d4d4',');'],
-        // error highlight line
-        ['#ff000040','                                              ^^^^^^^^^^^'],
-      ];
-
-      ctx.font = '12px monospace';
-      codeLine.forEach((parts, li) => {
-        let x = 50;
-        const y = 60 + li * 24;
-        if (li === 14) {
-          // red squiggle underline line
-          ctx.fillStyle = 'rgba(255,50,50,0.15)';
-          ctx.fillRect(40, y-16, W-40, 22);
+  // Extract dan simpan memory (silent — ga ganggu flow utama)
+  try {
+    const conversation = `User: ${question}\nSaentra: ${data.answer}`
+    const memoryData = await httpPost(`${BACKEND_URL}/extract-memory`, { conversation })
+    if (memoryData.memories && memoryData.memories.length > 0) {
+      memoryData.memories.forEach(({ key, value }) => {
+        if (key && value) {
+          setMemory(key, value)
+          console.log(`💾 Memory saved: ${key} = ${value}`)
         }
-        for (let pi = 0; pi < parts.length; pi += 2) {
-          ctx.fillStyle = parts[pi];
-          ctx.fillText(parts[pi+1] || '', x, y);
-          x += ctx.measureText(parts[pi+1] || '').width;
-        }
-      });
-
-      // Saentra overlay panel (right side)
-      const PX = 470, PY = 45, PW = 300, PH = 420;
-      // shadow
-      ctx.shadowColor = 'rgba(0,0,0,0.7)';
-      ctx.shadowBlur = 30;
-      ctx.fillStyle = '#0f1923';
-      ctx.beginPath();
-      ctx.roundRect(PX, PY, PW, PH, 12);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-
-      // Panel border
-      ctx.strokeStyle = '#1a3040';
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.roundRect(PX, PY, PW, PH, 12); ctx.stroke();
-
-      // Panel header
-      ctx.fillStyle = '#0c1a1f';
-      ctx.beginPath(); ctx.roundRect(PX, PY, PW, 44, [12,12,0,0]); ctx.fill();
-      ctx.fillStyle = '#0ea5a0';
-      ctx.font = 'bold 13px sans-serif';
-      ctx.fillText('✦ Saentra', PX+14, PY+27);
-      ctx.fillStyle = '#333';
-      ctx.font = '11px sans-serif';
-      ctx.fillText('Beta', PX+90, PY+27);
-
-      // Toggle
-      ctx.fillStyle = '#0ea5a0';
-      ctx.beginPath(); ctx.roundRect(PX+PW-58, PY+14, 40, 18, 9); ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(PX+PW-24, PY+23, 7, 0, Math.PI*2); ctx.fill();
-
-      // User message bubble
-      ctx.fillStyle = '#1a2f3e';
-      ctx.beginPath(); ctx.roundRect(PX+10, PY+54, PW-20, 50, 10); ctx.fill();
-      ctx.fillStyle = '#6a9aaa';
-      ctx.font = '10px sans-serif';
-      ctx.fillText('📸 dengan screenshot', PX+18, PY+70);
-      ctx.fillStyle = '#e8f4f4';
-      ctx.font = '12px sans-serif';
-      ctx.fillText('kenapa fetchUserData error', PX+18, PY+90);
-      ctx.fillText('terus pas userId undefined?', PX+18, PY+103);
-
-      // AI response
-      ctx.fillStyle = '#111e26';
-      ctx.beginPath(); ctx.roundRect(PX+10, PY+116, PW-20, 250, 10); ctx.fill();
-
-      ctx.fillStyle = '#0ea5a0';
-      ctx.font = 'bold 13px sans-serif';
-      ctx.fillText('# Root Cause Ditemukan ✓', PX+18, PY+138);
-
-      const aiLines = [
-        ['#e8f4f4', 'Masalahnya: kamu passing '],
-        ['#0ea5a0', 'undefined'],
-        ['#e8f4f4', ' sebagai userId.'],
-        [''],
-        ['#6a9aaa', 'Fix-nya simpel:'],
-        [''],
-        ['#569cd6', 'if ','#d4d4d4','(!userId) ','#c586c0','return','#ce9178',' null;'],
-        [''],
-        ['#6a9aaa', 'Tambahkan validasi di baris'],
-        ['#6a9aaa', 'pertama fungsinya. Juga'],
-        ['#6a9aaa', 'handle kasus response.ok'],
-        ['#6a9aaa', 'sebelum .json() 👆'],
-      ];
-
-      ctx.font = '12px sans-serif';
-      let aiY = PY+158;
-      aiLines.forEach(parts => {
-        if (parts.length === 1 && parts[0] === '') { aiY += 10; return; }
-        let ax = PX+18;
-        for (let pi=0; pi<parts.length; pi+=2) {
-          ctx.fillStyle = parts[pi];
-          const txt = parts[pi+1] || parts[pi+1-1] || '';
-          if (pi === 0 && parts.length <= 2) {
-            ctx.fillText(parts[pi], ax, aiY);
-            ax += ctx.measureText(parts[pi]).width;
-          } else if (pi < parts.length) {
-            ctx.fillStyle = parts[pi];
-            if (parts[pi+1]) {
-              ctx.fillText(parts[pi+1] || '', ax, aiY);
-              ax += ctx.measureText(parts[pi+1] || '').width;
-            }
-          }
-        }
-        aiY += 18;
-      });
-
-      // Input bar
-      ctx.fillStyle = '#0c1520';
-      ctx.beginPath(); ctx.roundRect(PX+10, PY+PH-52, PW-20, 36, 8); ctx.fill();
-      ctx.fillStyle = '#6a9aaa';
-      ctx.font = '12px sans-serif';
-      ctx.fillText('Tanya apapun tentang layar kamu...', PX+18, PY+PH-28);
-
-      // Send button
-      ctx.fillStyle = '#0ea5a0';
-      ctx.beginPath(); ctx.roundRect(PX+PW-50, PY+PH-50, 32, 32, 8); ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 14px sans-serif';
-      ctx.fillText('↑', PX+PW-38, PY+PH-28);
-
-      // Bottom hint
-      ctx.fillStyle = '#3a5060';
-      ctx.font = '10px sans-serif';
-      ctx.fillText('Enter kirim · Shift+Enter baris baru', PX+PW/2-70, PY+PH+16);
+      })
     }
-  </script>
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.querySelectorAll('.pbar').forEach(bar => {
-            bar.style.width = bar.dataset.w;
-          });
-          pobs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.4 });
-    const pc = document.getElementById('price-compare');
-    if (pc) pobs.observe(pc);
-  </script>
-</body>
-</html>
+  } catch (err) {
+    console.log('Memory extract skip:', err.message)
+  }
+
+  return data.answer
+}
+
+ipcMain.handle('take-screenshot', async () => {
+  overlayWindow.hide()
+  await new Promise(r => setTimeout(r, 200))
+  const screenshot = await takeScreenshot()
+  overlayWindow.show()
+  return screenshot
+})
+
+ipcMain.handle('ask-claude', async (event, { question, screenshot, chatHistory }) => {
+  try {
+    const answer = await askNalar(question, screenshot, chatHistory)
+    return { success: true, answer }
+  } catch (err) {
+    console.error('Nalar error:', err)
+    const isOverloaded = err.message?.includes('Overloaded') || err.message?.includes('overloaded')
+    const userMessage = isOverloaded
+      ? 'Server AI lagi sibuk, sudah dicoba 3x. Tunggu sebentar lalu coba lagi ya 🙏'
+      : `Error: ${err.message}`
+    return { success: false, answer: userMessage }
+  }
+})
+
+ipcMain.handle('toggle-window', () => {
+  if (overlayWindow.isVisible()) {
+    overlayWindow.hide()
+  } else {
+    overlayWindow.show()
+    overlayWindow.focus()
+  }
+})
+
+app.whenReady().then(() => {
+  app.setLoginItemSettings({ openAtLogin: true })
+  createOverlay()
+
+  const hotkey = process.platform === 'darwin' ? 'Cmd+Shift+Space' : 'Ctrl+Shift+Space'
+  globalShortcut.register(hotkey, () => {
+    if (overlayWindow.isVisible()) {
+      overlayWindow.hide()
+    } else {
+      overlayWindow.show()
+      overlayWindow.focus()
+    }
+  })
+
+  console.log(`✅ Saentra AI aktif! Tekan ${hotkey} untuk toggle`)
+})
+
+app.on('will-quit', () => globalShortcut.unregisterAll())
+app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
