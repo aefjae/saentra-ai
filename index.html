@@ -830,14 +830,40 @@
   </nav>
 
   <!-- HERO -->
+  <style>
+    .rotating-text-wrap {
+      display: inline-block;
+      position: relative;
+      vertical-align: bottom;
+    }
+    .rotating-text {
+      display: inline-block;
+      color: var(--teal);
+    }
+    .rotating-text.fade-out {
+      animation: rotFadeOut 0.3s ease forwards;
+    }
+    .rotating-text.fade-in {
+      animation: rotFadeIn 0.3s ease forwards;
+    }
+    @keyframes rotFadeOut {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
+    @keyframes rotFadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
   <section class="hero">
     <div class="hero-eyebrow">BETA — AI Personal Asisten untuk Indonesia</div>
     <div class="hero-wordmark">
       <span class="hw-s">S</span><span class="hw-ae">ae</span><span class="hw-n">n</span><span class="hw-t">t</span><span class="hw-r">r</span><span class="hw-a2">a</span>
     </div>
-    <div class="hero-wordmark-sub">AI yang <span>kenal</span> kamu,<br/>dengan <span>seizin</span> kamu</div>
+    <div class="hero-wordmark-sub">Ga perlu ke web lagi —<br/>Saentra langsung <span class="rotating-text-wrap"><span class="rotating-text" id="rotatingText">bantu masalahmu</span></span></div>
     <p class="hero-desc">
-      AI personal asisten gratis dengan memory — yang AI gratis lain belum kasih. Saentra bisa inget siapa kamu, bukan cuma apa yang kamu tanya. Tapi kalau kamu tidak mau, tinggal matiin — dan Saentra tidak akan menyimpan apapun tentang kamu.
+      Apapun yang lagi kamu kerjain — Saentra ada di sebelahmu. Langsung di layarmu, tanpa buka tab baru, tanpa copy-paste. Cukup panggil, dan Saentra siap.
     </p>
     <div class="download-group">
       <a href="#mulai" class="btn btn-primary">✨ Mulai Gratis</a>
@@ -846,6 +872,29 @@
     <p class="hero-note">Gratis · Memory 30 hari · Tanpa kartu kredit · Hapus data kapanpun</p>
     <div class="powered-by">Powered by <span>Claude · Anthropic</span> — AI terpercaya</div>
   </section>
+
+  <script>
+    const rotatingWords = [
+      'bantu masalahmu',
+      'kasih pendapat',
+      'tukar pikiran bareng kamu',
+      'bantu nulis',
+      'cek fakta',
+      'jelasin code'
+    ]
+    let wordIdx = 0
+    const el = document.getElementById('rotatingText')
+    setInterval(() => {
+      el.classList.add('fade-out')
+      setTimeout(() => {
+        wordIdx = (wordIdx + 1) % rotatingWords.length
+        el.textContent = rotatingWords[wordIdx]
+        el.classList.remove('fade-out')
+        el.classList.add('fade-in')
+        setTimeout(() => el.classList.remove('fade-in'), 300)
+      }, 300)
+    }, 2800)
+  </script>
 
   <!-- KENAPA SAENTRA — comparison table -->
   <section class="comparison" id="perbandingan">
