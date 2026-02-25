@@ -270,6 +270,45 @@
       transform: translateY(-2px);
     }
 
+    .btn-os {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .btn-os:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(14,165,160,0.15);
+    }
+    .btn-os.primary {
+      background: var(--teal);
+      color: var(--bg);
+      border-color: var(--teal);
+      box-shadow: 0 0 30px rgba(14,165,160,0.3);
+    }
+    .btn-os.primary:hover {
+      background: var(--teal-light);
+      border-color: var(--teal-light);
+      box-shadow: 0 0 40px rgba(14,165,160,0.5);
+    }
+    .os-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
     .hero-note {
       font-size: 12px;
       color: var(--muted);
@@ -865,9 +904,19 @@
     <p class="hero-desc">
       Apapun yang lagi kamu kerjain — Saentra ada di sebelahmu. Langsung di layarmu, tanpa buka tab baru, tanpa copy-paste. Cukup panggil, dan Saentra siap.
     </p>
-    <div class="download-group">
-      <a href="#mulai" class="btn btn-primary">✨ Mulai Gratis</a>
-      <a href="#fitur" class="btn btn-secondary">Pelajari lebih lanjut</a>
+<div class="download-group">
+      <a href="https://github.com/aefjae/saentra-ai/releases/download/v.0.1.0/saentra-ai-windows-latest.zip" class="btn-os primary" download>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+        Windows
+      </a>
+      <a href="https://github.com/aefjae/saentra-ai/releases/download/v.0.1.0/saentra-ai-macos-latest.zip" class="btn-os" download>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
+        macOS
+      </a>
+      <a href="https://github.com/aefjae/saentra-ai/releases/download/v.0.1.0/saentra-ai-ubuntu-latest.zip" class="btn-os" download>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.182a9.818 9.818 0 1 1 0 19.636A9.818 9.818 0 0 1 12 2.182zm0 1.636a2.727 2.727 0 1 0 0 5.454 2.727 2.727 0 0 0 0-5.454zm-4.364 6.546a2.727 2.727 0 1 0 0 5.454 2.727 2.727 0 0 0 0-5.454zm8.728 0a2.727 2.727 0 1 0 0 5.454 2.727 2.727 0 0 0 0-5.454z"/></svg>
+        Linux
+      </a>
     </div>
     <p class="hero-note">Gratis · Memory 30 hari · Tanpa kartu kredit · Hapus data kapanpun</p>
     <div class="powered-by">Powered by <span>Claude · Anthropic</span> — AI terpercaya</div>
@@ -1119,7 +1168,7 @@
           <li><span class="check">✅</span> Bahasa Indonesia</li>
           <li><span class="check">✅</span> Screenshot otomatis</li>
         </ul>
-        <a href="#mulai" class="pricing-btn">Mulai Gratis</a>
+        <a href="#mulai" class="pricing-btn">Download Gratis ↓</a>
       </div>
       <div class="pricing-card highlight">
         <div class="pricing-label">Top Up</div>
@@ -1240,7 +1289,18 @@
     <h2>Mulai sekarang,<br/><span style="color:var(--teal)">gratis</span></h2>
     <p>Rasain AI yang beneran kenal kamu — bukan yang lupa setiap sesi</p>
     <div class="download-group">
-      <a href="https://github.com/aefjae/saentra-ai/releases/tag/v.0.1.0" class="btn btn-primary">✨ Coba Saentra Gratis</a>
+      <a href="https://github.com/aefjae/saentra-ai/releases/download/v.0.1.0/saentra-ai-windows-latest.zip" class="btn-os primary" download>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+        Windows
+      </a>
+      <a href="https://github.com/aefjae/saentra-ai/releases/download/v.0.1.0/saentra-ai-macos-latest.zip" class="btn-os" download>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
+        macOS
+      </a>
+      <a href="https://github.com/aefjae/saentra-ai/releases/download/v.0.1.0/saentra-ai-ubuntu-latest.zip" class="btn-os" download>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.182a9.818 9.818 0 1 1 0 19.636A9.818 9.818 0 0 1 12 2.182zm0 1.636a2.727 2.727 0 1 0 0 5.454 2.727 2.727 0 0 0 0-5.454zm-4.364 6.546a2.727 2.727 0 1 0 0 5.454 2.727 2.727 0 0 0 0-5.454zm8.728 0a2.727 2.727 0 1 0 0 5.454 2.727 2.727 0 0 0 0-5.454z"/></svg>
+        Linux
+      </a>
     </div>
     <p style="font-size:12px;color:var(--muted);margin-top:16px">Gratis · Memory 30 hari · Tanpa kartu kredit · Powered by Claude</p>
   </section>
